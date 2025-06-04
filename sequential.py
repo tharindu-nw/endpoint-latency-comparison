@@ -5,13 +5,11 @@ Compares response times between AKS and Choreo API endpoints
 """
 
 import urllib.request
-import urllib.parse
 import urllib.error
-import requests
 import time
 import json
 import statistics
-from typing import Dict, List, Tuple, Any
+from typing import Dict, Any
 import os
 
 class APITester:
@@ -222,168 +220,168 @@ def main():
     
     # Define API pairs to test
     api_pairs = [
-        # {
-        #     'name': 'get_package_versions',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/registry/packages/ballerina/http'
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/registry/packages/ballerina/http'
-        #     }
-        # },
-        # {
-        #     'name': 'get_package_details',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/registry/packages/ballerina/http/2.8.0'  # Replaced * with specific version
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/registry/packages/ballerina/http/2.8.0'  # Replaced * with specific version
-        #     }
-        # },
-        # {
-        #     'name': 'resolve_package_dependencies',  # Fixed typo
-        #     'aks': {
-        #         'method': 'POST',
-        #         'url': f'{BASE_URL_AKS}/registry/packages/resolve-dependencies',
-        #         'body': json.dumps({
-        #             "packages": [
-        #                 {"org": "ballerina", "name": "file", "version": "1.7.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "observe", "version": "1.0.7", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "task", "version": "2.3.2", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "jwt", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "os", "version": "1.6.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "mime", "version": "2.7.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "io", "version": "1.4.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "log", "version": "2.7.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "time", "version": "2.2.4", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "constraint", "version": "1.2.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "cache", "version": "3.5.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "auth", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "http", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "websocket", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "oauth2", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "crypto", "version": "2.3.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "url", "version": "2.2.4", "mode": "medium"}
-        #             ]
-        #         }),
-        #         'headers': {'Content-Type': 'application/json'}
-        #     },
-        #     'choreo': {
-        #         'method': 'POST',
-        #         'url': f'{BASE_URL_CHOREO}/registry/packages/resolve-dependencies',
-        #         'body': json.dumps({
-        #             "packages": [
-        #                 {"org": "ballerina", "name": "file", "version": "1.7.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "observe", "version": "1.0.7", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "task", "version": "2.3.2", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "jwt", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "os", "version": "1.6.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "mime", "version": "2.7.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "io", "version": "1.4.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "log", "version": "2.7.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "time", "version": "2.2.4", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "constraint", "version": "1.2.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "cache", "version": "3.5.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "auth", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "http", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "websocket", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "oauth2", "version": "2.8.0", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "crypto", "version": "2.3.1", "mode": "medium"},
-        #                 {"org": "ballerina", "name": "url", "version": "2.2.4", "mode": "medium"}
-        #             ]
-        #         }),
-        #         'headers': {'Content-Type': 'application/json'}
-        #     }
-        # },
-        # {
-        #     'name': 'search_packages',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/registry/search-packages?q=org:ballerina&offset=0&limit=10&readme=false&sort=relevance,DESC'
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/registry/search-packages?q=org:ballerina&offset=0&limit=10&readme=false&sort=relevance,DESC'
-        #     }
-        # },
-        # {
-        #     'name': 'search_package_symbols',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/registry/search-symbols?q=org:ballerina&offset=0&limit=10&readme=false&sort=relevance,DESC'
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/registry/search-symbols?q=org:ballerina&offset=0&limit=10&readme=false&sort=relevance,DESC'
-        #     }
-        # },
-        # {
-        #     'name': 'package_search_suggestions',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/registry/search-suggestions?q=goog&mode=all'
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/registry/search-suggestions?q=goog&mode=all'
-        #     }
-        # },
-        # {
-        #     'name': 'get_organizations_of_user',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/users/{USER_UUID}/organizations',
-        #         'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/users/{USER_UUID}/organizations',
-        #         'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
-        #     }
-        # },
-        # {
-        #     'name': 'get_asgardeo_organizations_of_user',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/users/{USER_UUID}/organizations/asgardeo',
-        #         'headers': {'Authorization': f'Bearer {FRONTEND_AUTH_TOKEN}'}
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/users/{USER_UUID}/organizations/asgardeo',
-        #         'headers': {'Authorization': f'Bearer {FRONTEND_AUTH_TOKEN}'}
-        #     }
-        # },
-        # {
-        #     'name': 'get_users_of_organization',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/organizations/{ORG_NAME}/users',
-        #         'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/organizations/{ORG_NAME}/users',
-        #         'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
-        #     }
-        # },
-        # {
-        #     'name': 'get_invitations_of_organization',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/organizations/{ORG_NAME}/invitations',
-        #         'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/organizations/{ORG_NAME}/invitations',
-        #         'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
-        #     }
-        # },
+        {
+            'name': 'get_package_versions',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/registry/packages/ballerina/http'
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/registry/packages/ballerina/http'
+            }
+        },
+        {
+            'name': 'get_package_details',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/registry/packages/ballerina/http/2.8.0'  # Replaced * with specific version
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/registry/packages/ballerina/http/2.8.0'  # Replaced * with specific version
+            }
+        },
+        {
+            'name': 'resolve_package_dependencies',  # Fixed typo
+            'aks': {
+                'method': 'POST',
+                'url': f'{BASE_URL_AKS}/registry/packages/resolve-dependencies',
+                'body': json.dumps({
+                    "packages": [
+                        {"org": "ballerina", "name": "file", "version": "1.7.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "observe", "version": "1.0.7", "mode": "medium"},
+                        {"org": "ballerina", "name": "task", "version": "2.3.2", "mode": "medium"},
+                        {"org": "ballerina", "name": "jwt", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "os", "version": "1.6.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "mime", "version": "2.7.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "io", "version": "1.4.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "log", "version": "2.7.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "time", "version": "2.2.4", "mode": "medium"},
+                        {"org": "ballerina", "name": "constraint", "version": "1.2.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "cache", "version": "3.5.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "auth", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "http", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "websocket", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "oauth2", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "crypto", "version": "2.3.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "url", "version": "2.2.4", "mode": "medium"}
+                    ]
+                }),
+                'headers': {'Content-Type': 'application/json'}
+            },
+            'choreo': {
+                'method': 'POST',
+                'url': f'{BASE_URL_CHOREO}/registry/packages/resolve-dependencies',
+                'body': json.dumps({
+                    "packages": [
+                        {"org": "ballerina", "name": "file", "version": "1.7.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "observe", "version": "1.0.7", "mode": "medium"},
+                        {"org": "ballerina", "name": "task", "version": "2.3.2", "mode": "medium"},
+                        {"org": "ballerina", "name": "jwt", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "os", "version": "1.6.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "mime", "version": "2.7.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "io", "version": "1.4.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "log", "version": "2.7.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "time", "version": "2.2.4", "mode": "medium"},
+                        {"org": "ballerina", "name": "constraint", "version": "1.2.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "cache", "version": "3.5.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "auth", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "http", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "websocket", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "oauth2", "version": "2.8.0", "mode": "medium"},
+                        {"org": "ballerina", "name": "crypto", "version": "2.3.1", "mode": "medium"},
+                        {"org": "ballerina", "name": "url", "version": "2.2.4", "mode": "medium"}
+                    ]
+                }),
+                'headers': {'Content-Type': 'application/json'}
+            }
+        },
+        {
+            'name': 'search_packages',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/registry/search-packages?q=org:ballerina&offset=0&limit=10&readme=false&sort=relevance,DESC'
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/registry/search-packages?q=org:ballerina&offset=0&limit=10&readme=false&sort=relevance,DESC'
+            }
+        },
+        {
+            'name': 'search_package_symbols',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/registry/search-symbols?q=org:ballerina&offset=0&limit=10&readme=false&sort=relevance,DESC'
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/registry/search-symbols?q=org:ballerina&offset=0&limit=10&readme=false&sort=relevance,DESC'
+            }
+        },
+        {
+            'name': 'package_search_suggestions',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/registry/search-suggestions?q=goog&mode=all'
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/registry/search-suggestions?q=goog&mode=all'
+            }
+        },
+        {
+            'name': 'get_organizations_of_user',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/users/{USER_UUID}/organizations',
+                'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/users/{USER_UUID}/organizations',
+                'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
+            }
+        },
+        {
+            'name': 'get_asgardeo_organizations_of_user',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/users/{USER_UUID}/organizations/asgardeo',
+                'headers': {'Authorization': f'Bearer {FRONTEND_AUTH_TOKEN}'}
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/users/{USER_UUID}/organizations/asgardeo',
+                'headers': {'Authorization': f'Bearer {FRONTEND_AUTH_TOKEN}'}
+            }
+        },
+        {
+            'name': 'get_users_of_organization',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/organizations/{ORG_NAME}/users',
+                'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/organizations/{ORG_NAME}/users',
+                'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
+            }
+        },
+        {
+            'name': 'get_invitations_of_organization',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/organizations/{ORG_NAME}/invitations',
+                'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/organizations/{ORG_NAME}/invitations',
+                'headers': {'Authorization': f'Bearer {AUTH_TOKEN}'}
+            }
+        },
         {
             'name': 'graphql_package_details',
             'aks': {
@@ -413,54 +411,54 @@ def main():
                 'headers': {'Content-Type': 'application/json'}
             }
         },
-        # {
-        #     'name': 'get_latest_stdlib',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/docs/stdlib/latest'
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/docs/stdlib/latest'
-        #     }
-        # },
-        # {
-        #     'name': 'get_package_docs',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/docs/ballerina/http/2.14.1'
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/docs/ballerina/http/2.14.1'
-        #     }
-        # },
-        # {
-        #     'name': 'get_list_of_distributions',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/update-tool/distributions',
-        #         'headers': {'User-Agent': 'ballerina/slalpha5 (linux-64) Updater/1.3.1'}
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/update-tool/distributions',
-        #         'headers': {'User-Agent': 'ballerina/slalpha5 (linux-64) Updater/1.3.1'}
-        #     }
-        # },
-        # {
-        #     'name': 'get_update_versions',
-        #     'aks': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_AKS}/update-tool/update/versions',
-        #         'headers': {'User-Agent': 'ballerina/slalpha5 (linux-64) Updater/1.3.1'}
-        #     },
-        #     'choreo': {
-        #         'method': 'GET',
-        #         'url': f'{BASE_URL_CHOREO}/update-tool/update/versions',
-        #         'headers': {'User-Agent': 'ballerina/slalpha5 (linux-64) Updater/1.3.1'}
-        #     }
-        # }
+        {
+            'name': 'get_latest_stdlib',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/docs/stdlib/latest'
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/docs/stdlib/latest'
+            }
+        },
+        {
+            'name': 'get_package_docs',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/docs/ballerina/http/2.14.1'
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/docs/ballerina/http/2.14.1'
+            }
+        },
+        {
+            'name': 'get_list_of_distributions',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/update-tool/distributions',
+                'headers': {'User-Agent': 'ballerina/slalpha5 (linux-64) Updater/1.3.1'}
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/update-tool/distributions',
+                'headers': {'User-Agent': 'ballerina/slalpha5 (linux-64) Updater/1.3.1'}
+            }
+        },
+        {
+            'name': 'get_update_versions',
+            'aks': {
+                'method': 'GET',
+                'url': f'{BASE_URL_AKS}/update-tool/update/versions',
+                'headers': {'User-Agent': 'ballerina/slalpha5 (linux-64) Updater/1.3.1'}
+            },
+            'choreo': {
+                'method': 'GET',
+                'url': f'{BASE_URL_CHOREO}/update-tool/update/versions',
+                'headers': {'User-Agent': 'ballerina/slalpha5 (linux-64) Updater/1.3.1'}
+            }
+        }
     ]
     
     # Initialize tester

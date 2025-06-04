@@ -7,6 +7,13 @@ There are two main test scenarios considered.
 
 ## How to run the tests
 
+### Environment Variables
+The following env variables need to be set for the scripts to run
+1. `FRONTEND_AUTH_TOKEN` - Auth token from Ballerina Central website
+2. `AUTH_TOKEN` - Ballerina CLI Token
+3. `ORG_NAME` - Name of an organization that the owner has admin access to
+4. `USER_UUID` - Token user's uuid
+
 ### k6 Concurrent Testing
 
 1. Install k6 ([follow the installation guide](https://grafana.com/docs/k6/latest/set-up/install-k6/))
@@ -18,10 +25,7 @@ k6 run --summary-trend-stats "min,avg,max,p(99)" k6_concurrent_test.js
 
 ### Sequential Testing
 
-1. Requires python3 and the `requests` library
-```
-pip3 install requests
-```
+1. Requires python3 
 2. Run the script
 ```
 python3 sequential.py
